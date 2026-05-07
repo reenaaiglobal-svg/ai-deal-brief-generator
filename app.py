@@ -61,30 +61,83 @@ with st.form("deal_form"):
 # -----------------------------
 if submitted:
 
-    prompt = f"""
-    Generate a professional enterprise deal brief.
+   prompt = f"""
+You are a senior enterprise GenAI presales consultant.
 
-    Deal Name: {deal_name}
-    Client: {client_name}
-    Stage: {stage}
-    Contacts: {contacts}
-    Amount: {amount}
-    Date: {date}
-    Tech Stack: {tech_stack}
+Generate a professional deal brief in clear bullet-point format.
 
-    Problem Statement:
-    {problem_statement}
+Client: {client_name}
+Deal Name: {deal_name}
+Stage: {stage}
+Contacts: {contacts}
+Amount: {amount}
+Expected Close Date: {date}
 
-    Include:
-    - Executive Summary
-    - Recommended GenAI Use Cases
-    - Risks
-    - Competitive Positioning
-    - Resource Requirements
-    - Suggested Next Steps
-    - Qualification Questions
-    """
+Tech Stack:
+{tech_stack}
 
+Problem Statement:
+{problem_statement}
+
+Our Service Categories:
+- GenAI Strategy
+- AI/ML Engineering
+- Legacy Modernization
+- Intelligent Automation
+- Data & Analytics
+- Cloud Transformation
+- Platform Engineering
+
+Consider:
+- enterprise consulting positioning
+- delivery scalability
+- reusable accelerators
+- account farming opportunities
+- competitive differentiation
+- realistic implementation concerns
+
+Include:
+
+1. Executive Summary
+- concise bullets
+- business outcomes
+- transformation value
+
+2. Recommended GenAI Use Cases
+- prioritized bullets
+- mapped to business value
+- quick wins + strategic bets
+
+3. Competitive Positioning
+- likely competitors
+- our differentiation
+- why client should choose us
+
+4. Implementation Risks
+- technical
+- governance
+- adoption
+- data/security
+
+5. Resource Requirements
+- skills needed
+- team structure
+- estimated delivery streams
+
+6. Suggested Next Steps
+- discovery workshops
+- assessments
+- pilots/POCs
+- roadmap activities
+
+7. Key Qualification Questions
+- stakeholder questions
+- budget questions
+- platform/data questions
+- success metrics
+
+Format everything professionally using bullet points and section headings.
+"""
     with st.spinner("Generating deal brief..."):
 
         response = client.chat.completions.create(
