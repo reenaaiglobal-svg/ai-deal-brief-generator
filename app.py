@@ -1,11 +1,11 @@
 import streamlit as st
-import google.generativeai as genai
+from openai import OpenAI
 from docx import Document
 from io import BytesIO
 
-# -------------------------
+# -----------------------------
 # PAGE CONFIG
-# -------------------------
+# -----------------------------
 st.set_page_config(
     page_title="AI Deal Brief Generator",
     layout="wide"
@@ -13,17 +13,17 @@ st.set_page_config(
 
 st.title("AI Deal Brief Generator")
 
-# -------------------------
-# GEMINI CONFIG
-# -------------------------
-genai.configure(
-    api_key=st.secrets["GEMINI_API_KEY"]
+# -----------------------------
+# GROQ CLIENT
+# -----------------------------
+client = OpenAI(
+    api_key=st.secrets["GROQ_API_KEY"],
+    base_url="https://api.groq.com/openai/v1"
 )
 
-model = genai.GenerativeModel("models/gemini-1.5-flash")
-# -------------------------
-# FORM
-# -------------------------
+# -----------------------------
+# INPUT FORM
+# -----------------------------
 with st.form("deal_form"):
 
     deal_name = st.text_input("Deal Name")
@@ -47,9 +47,7 @@ with st.form("deal_form"):
 
     date = st.date_input("Expected Close Date")
 
-    tech_stack = st.text_area(
-        "Tech Stack"
-    )
+    tech_stack = st.text_area("Tech Stack")
 
     problem_statement = st.text_area(
         "Problem Statement / Notes",
@@ -58,9 +56,9 @@ with st.form("deal_form"):
 
     submitted = st.form_submit_button("Generate Deal Brief")
 
-# -------------------------
-# GENERATE
-# -------------------------
+# -----------------------------
+# GENERATE OUTPUT
+# -----------------------------
 if submitted:
 
     prompt = f"""
@@ -79,29 +77,45 @@ if submitted:
 
     Include:
     - Executive Summary
-    - GenAI Use Cases
+    - Recommended GenAI Use Cases
     - Risks
     - Competitive Positioning
     - Resource Requirements
-    - Next Steps
+    - Suggested Next Steps
     - Qualification Questions
     """
 
-    with st.spinner("Generating..."):
+    with st.spinner("Generating deal brief..."):
 
-        response = model.generate_content(prompt)
+        response = client.chat.completions.create(
+            model="llama3-70b-8192",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a senior enterprise GenAI presales consultant."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.4
+        )
 
-        output = response.text
+        output = response.choices[0].message.content
 
+    # -----------------------------
+    # DISPLAY OUTPUT
+    # -----------------------------
     st.subheader("Generated Deal Brief")
 
     st.markdown(output)
 
     st.code(output)
 
-    # -------------------------
+    # -----------------------------
     # WORD DOC
-    # -------------------------
+    # -----------------------------
     doc = Document()
 
     doc.add_heading("AI Deal Brief", level=1)
