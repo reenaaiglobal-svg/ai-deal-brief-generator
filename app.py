@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 from openai import OpenAI
 from docx import Document
@@ -47,11 +48,14 @@ with st.form("deal_form"):
 
     date = st.date_input("Expected Close Date")
 
-    tech_stack = st.text_area("Tech Stack")
+    tech_stack = st.text_area(
+        "Tech Stack",
+        placeholder="Azure, AWS, SAP, Salesforce, Databricks..."
+    )
 
     problem_statement = st.text_area(
         "Problem Statement / Notes",
-        height=200
+        height=220
     )
 
     submitted = st.form_submit_button("Generate Deal Brief")
@@ -61,87 +65,96 @@ with st.form("deal_form"):
 # -----------------------------
 if submitted:
 
-   prompt = f"""
-You are a senior enterprise GenAI presales consultant.
+    prompt = f"""
+    You are a senior enterprise GenAI presales consultant.
 
-Generate a professional deal brief in clear bullet-point format.
+    Generate a professional enterprise deal brief in structured bullet-point format.
 
-Client: {client_name}
-Deal Name: {deal_name}
-Stage: {stage}
-Contacts: {contacts}
-Amount: {amount}
-Expected Close Date: {date}
+    Client: {client_name}
 
-Tech Stack:
-{tech_stack}
+    Deal Name: {deal_name}
 
-Problem Statement:
-{problem_statement}
+    Stage: {stage}
 
-Our Service Categories:
-- GenAI Strategy
-- AI/ML Engineering
-- Legacy Modernization
-- Intelligent Automation
-- Data & Analytics
-- Cloud Transformation
-- Platform Engineering
+    Contacts: {contacts}
 
-Consider:
-- enterprise consulting positioning
-- delivery scalability
-- reusable accelerators
-- account farming opportunities
-- competitive differentiation
-- realistic implementation concerns
+    Amount: {amount}
 
-Include:
+    Expected Close Date: {date}
 
-1. Executive Summary
-- concise bullets
-- business outcomes
-- transformation value
+    Tech Stack:
+    {tech_stack}
 
-2. Recommended GenAI Use Cases
-- prioritized bullets
-- mapped to business value
-- quick wins + strategic bets
+    Problem Statement:
+    {problem_statement}
 
-3. Competitive Positioning
-- likely competitors
-- our differentiation
-- why client should choose us
+    Our Service Categories:
+    - GenAI Strategy
+    - AI/ML Engineering
+    - Intelligent Automation
+    - Legacy Modernization
+    - Data & Analytics
+    - Cloud Transformation
+    - Platform Engineering
 
-4. Implementation Risks
-- technical
-- governance
-- adoption
-- data/security
+    Consider:
+    - enterprise consulting positioning
+    - reusable accelerators
+    - scalability
+    - governance
+    - delivery feasibility
+    - account farming opportunities
+    - competitive differentiation
 
-5. Resource Requirements
-- skills needed
-- team structure
-- estimated delivery streams
+    Include the following sections:
 
-6. Suggested Next Steps
-- discovery workshops
-- assessments
-- pilots/POCs
-- roadmap activities
+    1. Executive Summary
+    - concise bullets
+    - business impact
+    - transformation value
 
-7. Key Qualification Questions
-- stakeholder questions
-- budget questions
-- platform/data questions
-- success metrics
+    2. Recommended GenAI Use Cases
+    - prioritized recommendations
+    - quick wins
+    - strategic opportunities
 
-Format everything professionally using bullet points and section headings.
-"""
+    3. Competitive Positioning
+    - likely competitors
+    - differentiation strategy
+    - why client should choose us
+
+    4. Implementation Risks
+    - technical risks
+    - governance risks
+    - adoption risks
+    - data/security concerns
+
+    5. Resource Requirements
+    - suggested roles
+    - skills needed
+    - delivery structure
+
+    6. Suggested Next Steps
+    - workshops
+    - assessments
+    - POCs
+    - roadmap steps
+
+    7. Key Qualification Questions
+    - stakeholder alignment
+    - budget/timeline
+    - platform readiness
+    - data readiness
+    - success metrics
+
+    Format professionally using headings and bullet points.
+    """
+
     with st.spinner("Generating deal brief..."):
 
         response = client.chat.completions.create(
-model="llama-3.1-8b-instant",            messages=[
+            model="llama-3.1-8b-instant",
+            messages=[
                 {
                     "role": "system",
                     "content": "You are a senior enterprise GenAI presales consultant."
@@ -166,11 +179,18 @@ model="llama-3.1-8b-instant",            messages=[
     st.code(output)
 
     # -----------------------------
-    # WORD DOC
+    # WORD DOCUMENT
     # -----------------------------
     doc = Document()
 
     doc.add_heading("AI Deal Brief", level=1)
+
+    doc.add_paragraph(f"Client: {client_name}")
+    doc.add_paragraph(f"Deal Name: {deal_name}")
+    doc.add_paragraph(f"Stage: {stage}")
+    doc.add_paragraph(f"Amount: {amount}")
+
+    doc.add_heading("Generated Brief", level=2)
 
     doc.add_paragraph(output)
 
@@ -180,9 +200,13 @@ model="llama-3.1-8b-instant",            messages=[
 
     buffer.seek(0)
 
+    # -----------------------------
+    # DOWNLOAD BUTTON
+    # -----------------------------
     st.download_button(
         label="Download Word Document",
         data=buffer,
         file_name=f"{deal_name}_Deal_Brief.docx",
         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     )
+```
