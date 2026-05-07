@@ -1,5 +1,5 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 from docx import Document
 from io import BytesIO
 
@@ -14,11 +14,12 @@ st.set_page_config(
 st.title("AI Deal Brief Generator")
 
 # ---------------------------------
-# GEMINI API CONFIG
+# GEMINI CLIENT
 # ---------------------------------
-genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+client = genai.Client(
+    api_key=st.secrets["GEMINI_API_KEY"]
+)
 
-model = genai.GenerativeModel("models/gemini-1.5-flash")
 # ---------------------------------
 # INPUT FORM
 # ---------------------------------
@@ -47,18 +48,18 @@ with st.form("deal_form"):
 
     tech_stack = st.text_area(
         "Tech Stack",
-        placeholder="Azure, AWS, OpenAI, Salesforce, SAP..."
+        placeholder="Azure, AWS, SAP, Salesforce..."
     )
 
     problem_statement = st.text_area(
         "Problem Statement / Notes",
-        height=180
+        height=200
     )
 
     submitted = st.form_submit_button("Generate Deal Brief")
 
 # ---------------------------------
-# GENERATE OUTPUT
+# GENERATE CONTENT
 # ---------------------------------
 if submitted:
 
@@ -68,12 +69,19 @@ if submitted:
     Generate a structured deal brief.
 
     Deal Name: {deal_name}
+
     Client: {client_name}
-    Stage: {stage}
+
+    Deal Stage: {stage}
+
     Contacts: {contacts}
-    Amount: {amount}
+
+    Deal Amount: {amount}
+
     Expected Close Date: {date}
-    Tech Stack: {tech_stack}
+
+    Tech Stack:
+    {tech_stack}
 
     Problem Statement:
     {problem_statement}
@@ -94,17 +102,20 @@ if submitted:
 
     7. Key Qualification Questions
 
-    Keep response professional, concise, and enterprise-focused.
+    Keep output concise and enterprise-focused.
     """
 
     with st.spinner("Generating deal brief..."):
 
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
 
         output = response.text
 
     # ---------------------------------
-    # DISPLAY OUTPUT
+    # SHOW OUTPUT
     # ---------------------------------
     st.subheader("Generated Deal Brief")
 
@@ -116,7 +127,7 @@ if submitted:
     st.code(output)
 
     # ---------------------------------
-    # WORD DOC GENERATION
+    # WORD DOC
     # ---------------------------------
     doc = Document()
 
