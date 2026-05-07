@@ -88,8 +88,7 @@ if submitted:
     with st.spinner("Generating deal brief..."):
 
         response = client.chat.completions.create(
-            model="llama3-70b-8192",
-            messages=[
+model="llama-3.1-8b-instant",            messages=[
                 {
                     "role": "system",
                     "content": "You are a senior enterprise GenAI presales consultant."
