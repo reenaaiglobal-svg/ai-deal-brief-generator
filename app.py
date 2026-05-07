@@ -1,4 +1,3 @@
-```python
 import streamlit as st
 from openai import OpenAI
 from docx import Document
@@ -143,4 +142,4 @@ if submitted:
         file_name=f"{deal_name}_Deal_Brief.docx",
         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     )
-```
+
